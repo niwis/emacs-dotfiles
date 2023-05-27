@@ -14,5 +14,5 @@
 (add-to-list 'default-frame-alist
 	     '(height . 80))
 ;; set default font
-(add-to-list 'default-frame-alist
-	     '(font . "DejaVu Sans Mono-10"))
+;(add-to-list 'default-frame-alist
+;	     '(font . "DejaVu Sans Mono-10"))
