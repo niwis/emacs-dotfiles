@@ -183,7 +183,7 @@ When you add a new element to the alist, keep in mind that you
   (when (not (display-graphic-p))
     (setq evil-want-C-i-jump nil))
   (setq evil-search-module 'evil-search)
-  (setq evil-want-minibuffer t)
+  (setq evil-want-minibuffer nil)
   :config
   (evil-mode 1)
   (global-undo-tree-mode 1)
@@ -456,22 +456,41 @@ When you add a new element to the alist, keep in mind that you
    "fr" 'consult-recent-file))
 
 ;; Project managment
-(use-package project
-  :ensure nil
-  :general
-  (general-define-key
-   :states '(normal visual insert emacs motion)
-   :keymaps 'override
-   :prefix "SPC"
-   :non-normal-prefix "M-SPC"
-   "pg" 'project-find-regexp
-   "pc" 'project-compile
-   "pf" 'project-find-file
-   "pb" 'project-switch-to-buffer
-   "pp" 'project-switch-project
-   ;;"pt" 'projectile-find-tag
-   "pD" 'project-dired
-   "pd" 'project-find-dir))
+;;(use-package project
+;;  :ensure nil
+;;  :general
+;;  (general-define-key
+;;   :states '(normal visual insert emacs motion)
+;;   :keymaps 'override
+;;   :prefix "SPC"
+;;   :non-normal-prefix "M-SPC"
+;;   "pg" 'project-find-regexp
+;;   "pc" 'project-compile
+;;   "pf" 'project-find-file
+;;   "pb" 'project-switch-to-buffer
+;;   "pp" 'project-switch-project
+;;   ;;"pt" 'projectile-find-tag
+;;   "pD" 'project-dired
+;;   "pd" 'project-find-dir))
+
+(use-package projectile
+  :ensure t
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map))
+  :init
+  ;(when (file-directory-p "/ssh:nwistoff@jingshan.ee.ethz.ch:~/projects")
+  (setq projectile-project-search-path '("~/projects" "/ssh:nwistoff@jingshan.ee.ethz.ch:~/projects"))
+  (setq projectile-auto-discover t)
+  (setq projectile-switch-project-action #'projectile-dired)
+  (setq projectile-enable-caching t)
+  (setq projectile-indexing-method 'native)
+  (projectile-mode +1))
+
+(use-package pinentry
+  :config
+  (setq epa-pinentry-mode 'loopback)
+  (pinentry-start))
 
 ;; ;; Project managment
 ;; (use-package projectile
@@ -666,7 +685,7 @@ When you add a new element to the alist, keep in mind that you
 
 (with-eval-after-load 'dired
   (setq dired-dwim-target t)
-  (setq dired-listing-switches "-alh --group-directories-first")
+  ;(setq dired-listing-switches "-alh --group-directories-first")
   (evil-collection-dired-setup))
 
 (with-eval-after-load 'info
@@ -677,6 +696,24 @@ When you add a new element to the alist, keep in mind that you
 
 (with-eval-after-load 'edebug
   (evil-collection-edebug-setup))
+
+;; render whitespaces
+(setq-default whitespace-style
+	      '(face spaces missing-newline-at-eof tabs trailing space-mark tab-mark))
+;; Don't enable whitespace for.
+(setq-default whitespace-global-modes
+              '(not shell-mode
+                    help-mode
+                    magit-mode
+                    magit-diff-mode
+                    ibuffer-mode
+                    dired-mode
+                    occur-mode))
+(global-whitespace-mode)
+
+
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired nil))
 
 (use-package compile
   :ensure nil
@@ -1077,12 +1114,12 @@ When you add a new element to the alist, keep in mind that you
   (add-hook 'verilog-mode-hook
 	    #'(lambda () (clear-abbrev-table verilog-mode-abbrev-table)))
   :config
-  (setq verilog-indent-level 4)
-  (setq verilog-indent-level-module 4)
-  (setq verilog-indent-level-declaration 4)
-  (setq verilog-indent-level-behavioral 4)
-  (setq verilog-case-indent 4)
-  (setq verilog-cexp-indent 4)
+  (setq verilog-indent-level 2)
+  (setq verilog-indent-level-module 2)
+  (setq verilog-indent-level-declaration 2)
+  (setq verilog-indent-level-behavioral 2)
+  (setq verilog-case-indent 2)
+  (setq verilog-cexp-indent 2)
   (setq verilog-auto-lineup 'all)
   (setq verilog-indent-lists nil)		; prevent large indents
   (setq verilog-linter "verilator --lint-only")
@@ -1292,7 +1329,7 @@ window."
    '(".#*" "*.cmti" "*.cmt" "*.annot" "*.cmi" "*.cmxa" "*.cma" "*.cmx" "*.cmo" "*.o" "*~" "*.bin" "*.lbin" "*.so" "*.a" "*.ln" "*.blg" "*.bbl" "*.elc" "*.lof" "*.glo" "*.idx" "*.lot" "*.fmt" "*.tfm" "*.class" "*.fas" "*.lib" "*.mem" "*.x86f" "*.sparcf" "*.dfsl" "*.pfsl" "*.d64fsl" "*.p64fsl" "*.lx64fsl" "*.lx32fsl" "*.dx64fsl" "*.dx32fsl" "*.fx64fsl" "*.fx32fsl" "*.sx64fsl" "*.sx32fsl" "*.wx64fsl" "*.wx32fsl" "*.fasl" "*.ufsl" "*.fsl" "*.dxl" "*.lo" "*.la" "*.gmo" "*.mo" "*.toc" "*.aux" "*.cp" "*.fn" "*.ky" "*.pg" "*.tp" "*.vr" "*.cps" "*.fns" "*.kys" "*.pgs" "*.tps" "*.vrs" "*.pyc" "*.pyo" "*.d"))
  '(merlin-completion-with-doc t)
  '(package-selected-packages
-   '(zotxt yaml-mode which-key wgrep vlf vertico use-package undo-tree tuareg rust-mode rmsbolt riscv-mode realgud rainbow-delimiters racket-mode package-lint org-noter orderless merlin magit ivy-xref ivy-bibtex general geiser exec-path-from-shell evil-surround esup eglot disaster cquery counsel-projectile counsel-etags consult clang-format bison-mode avy auto-virtualenv auctex-latexmk annalist anaconda-mode))
+   '(pinentry zotxt yaml-mode which-key wgrep vlf vertico use-package undo-tree tuareg rust-mode rmsbolt riscv-mode realgud rainbow-delimiters racket-mode package-lint org-noter orderless merlin magit ivy-xref ivy-bibtex general geiser exec-path-from-shell evil-surround esup eglot disaster cquery counsel-projectile counsel-etags consult clang-format bison-mode avy auto-virtualenv auctex-latexmk annalist anaconda-mode))
  '(safe-local-variable-values '((rmsbolt-asm-format) (rmsbolt-disassemble)))
  '(truncate-lines t)
  '(xterm-mouse-mode t))
@@ -1303,4 +1340,5 @@ window."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(whitespace-missing-newline-at-eof ((t (:background "dark red" :foreground "black"))))
+ '(whitespace-space ((t (:foreground "gray40")))))
